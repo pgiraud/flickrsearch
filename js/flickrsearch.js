@@ -10,6 +10,7 @@ flickrsearch = (function() {
   var selection = d3.select('#photos');
   var detail = d3.select('#detail');
 
+
   var auth = flickrAuth({
     api_key: API_KEY,
     api_secret: API_SECRET,
@@ -43,13 +44,19 @@ flickrsearch = (function() {
         });
     getSizes(photo, function(sizes) {
       console.log(sizes[0]);
-      enter.selectAll('.size')
-      .data(sizes)
-          .enter().append('div')
+      var sizeEnter = select.selectAll('.size')
+          .data(sizes).enter();
+      var div = sizeEnter.append('div')
           .attr('class', 'size')
           .html(function(d) {
-            return d.label + ' ' + d.width + 'x' + d.height + ' - ' + d.source;
+            return d.label + ' ' + d.width + 'x' + d.height;
           });
+      var button = div.append('button')
+          .attr('class', 'copy')
+          .attr('data-clipboard-text', function(d) { return d.source; })
+          .html('copy url');
+
+      new ZeroClipboard($('.copy'));
     });
   }
 

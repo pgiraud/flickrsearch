@@ -14,9 +14,14 @@ html, body {
   border-radius: 3px;
   display: inline-block;
   margin: 3px;
+  cursor: pointer;
 }
 
 #photos,
 #detail {
   overflow: auto;
+}
+
+#detail button {
+  cursor: pointer;
 }
