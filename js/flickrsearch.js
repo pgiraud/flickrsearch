@@ -8,6 +8,7 @@ flickrsearch = (function() {
   var page = 1;
 
   var selection = d3.select('#photos');
+  var detail = d3.select('#detail');
 
   var auth = flickrAuth({
     api_key: API_KEY,
@@ -15,18 +16,42 @@ flickrsearch = (function() {
     url: flickr_rest_url,
     done: function(result) {
       getPhotos(page, function(photos) {
-        console.log (photos);
         var items = selection.selectAll('.item')
             .data(photos, function(d) { return d.id; });
         var enter = items.enter().append('div')
             .attr('class', 'item');
-        enter.append('img')
+        var img = enter.append('img')
             .attr('src', function(d) {
               return getPhotoUrl(d, 's');
             });
+        img.on('click', function(d) {
+          showDetail(d);
+        });
       });
     }
   });
+
+  function showDetail(photo) {
+    var select = detail.selectAll('.photo')
+        .data([photo], function(d) {return d.id; });
+    select.exit().remove();
+    var enter = select.enter().append('div')
+        .attr('class', 'photo');
+    enter.append('img')
+        .attr('src', function(d) {
+          return getPhotoUrl(d, 'n');
+        });
+    getSizes(photo, function(sizes) {
+      console.log(sizes[0]);
+      enter.selectAll('.size')
+      .data(sizes)
+          .enter().append('div')
+          .attr('class', 'size')
+          .html(function(d) {
+            return d.label + ' ' + d.width + 'x' + d.height + ' - ' + d.source;
+          });
+    });
+  }
 
   function  getPhotos(page, callback) {
     page = page || 1;
@@ -54,6 +79,21 @@ flickrsearch = (function() {
     var url = 'http://farm{farm}.staticflickr.com/{server}/{id}_{secret}_{size}.jpg';
     photo.size = size || 's';
     return format(url, photo);
+  }
+
+  function getSizes(photo, callback) {
+    var params = {
+      api_key: API_KEY,
+      auth_token: oauth_token,
+      method: 'flickr.photos.getSizes',
+      photo_id: photo.id,
+      format: 'json',
+      extras: 'geo,machine_tags',
+      nojsoncallback: 1
+    };
+    $.getJSON(flickr_rest_url + $.param(params), function(data) {
+      callback(data.sizes.size);
+    });
   }
 
   function format(string, data) {

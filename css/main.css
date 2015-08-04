@@ -16,5 +16,7 @@ html, body {
   margin: 3px;
 }
 
+#photos,
 #detail {
+  overflow: auto;
 }
