@@ -7,30 +7,64 @@ flickrsearch = (function() {
 
   var page = 1;
 
-  var selection = d3.select('#photos');
+  var photos = d3.select('#photos');
   var detail = d3.select('#detail');
 
+  var loading = false;
+
+  var listLoading = photos.append('div')
+      .attr('class', 'loading')
+      .text('loading')
+      .style('display', 'none');
+
+  var selection = photos.select('.list');
 
   var auth = flickrAuth({
     api_key: API_KEY,
     api_secret: API_SECRET,
     url: flickr_rest_url,
     done: function(result) {
-      getPhotos(page, function(photos) {
-        var items = selection.selectAll('.item')
-            .data(photos, function(d) { return d.id; });
-        var enter = items.enter().append('div')
-            .attr('class', 'item');
-        var img = enter.append('img')
-            .attr('src', function(d) {
-              return getPhotoUrl(d, 's');
-            });
-        img.on('click', function(d) {
-          showDetail(d);
-        });
-      });
+      drawList();
     }
   });
+
+  photos.on('scroll', function() {
+    loadMore();
+  });
+
+  function drawList() {
+    loading = true;
+    getPhotos(page, function(photos) {
+      listLoading.style('display', 'none');
+      var items = selection.selectAll('.item')
+          .data(photos, function(d) { return d.id; });
+      var enter = items.enter().append('div')
+          .attr('class', 'item');
+      var img = enter.append('img')
+          .attr('src', function(d) {
+            return getPhotoUrl(d, 's');
+          });
+      img.on('click', function(d) {
+        showDetail(d);
+      });
+      loading = false;
+      window.setTimeout(loadMore, 500);
+    });
+  }
+
+  function loadMore() {
+    if (!loading) {
+      var list = photos.node();
+      if (list.scrollTop + list.offsetHeight >= list.scrollHeight) {
+        page++;
+        drawList();
+
+        window.setTimeout(function() {
+          listLoading.style('display', '');
+        }, 100);
+      }
+    }
+  }
 
   function showDetail(photo) {
     var select = detail.selectAll('.photo')
@@ -43,7 +77,6 @@ flickrsearch = (function() {
           return getPhotoUrl(d, 'n');
         });
     getSizes(photo, function(sizes) {
-      console.log(sizes[0]);
       var sizeEnter = select.selectAll('.size')
           .data(sizes).enter();
       var div = sizeEnter.append('div')
