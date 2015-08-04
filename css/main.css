@@ -1,0 +1,20 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+#photos {
+  float: left;
+  width: 50%;
+  height: 100%;
+}
+#photos .item {
+  padding: 3px;
+  border: 1px solid #dfdfdf;
+  border-radius: 3px;
+  display: inline-block;
+  margin: 3px;
+}
+
+#detail {
+}
