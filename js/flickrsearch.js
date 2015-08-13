@@ -77,19 +77,35 @@ flickrsearch = (function() {
           return getPhotoUrl(d, 'n');
         });
     getSizes(photo, function(sizes) {
+      for (var i = 0; i < sizes.length; i++) {
+        var size = sizes[i];
+        if (size.label == 'Medium 800') {
+          data = [size];
+        }
+      }
       var sizeEnter = select.selectAll('.size')
-          .data(sizes).enter();
+          .data(data).enter();
       var div = sizeEnter.append('div')
           .attr('class', 'size')
           .html(function(d) {
             return d.label + ' ' + d.width + 'x' + d.height;
           });
-      var button = div.append('button')
-          .attr('class', 'copy')
-          .attr('data-clipboard-text', function(d) { return d.source; })
-          .html('copy url');
+      //var button = div.append('button')
+          //.attr('class', 'copy')
+          //.attr('data-clipboard-text', function(d) { return d.source; })
+          //.html('copy url');
+      div.append('br');
+      var input = div.append('input')
+          .attr('type', 'text')
+          .attr('value', function(d) {return d.source; });
+      var input = div.append('input')
+          .attr('type', 'text')
+          .attr('value', function(d) {
+            return '![](' + d.source + ')';
+          });
+      div.append('hr');
 
-      new ZeroClipboard($('.copy'));
+      //new ZeroClipboard($('.copy'));
     });
   }
 
