@@ -76,12 +76,25 @@ flickrsearch = (function() {
         .attr('src', function(d) {
           return getPhotoUrl(d, 'n');
         });
+    enter.append('div')
+       .html(function(d) {
+       });
+    enter.append('input')
+        .attr('type', 'text')
+        .attr('value', function(d) {
+          return '[](' + getPhotoUrl(d, 't') + ')';
+        });
     getSizes(photo, function(sizes) {
+      var data = [];
       for (var i = 0; i < sizes.length; i++) {
         var size = sizes[i];
-        if (size.label == 'Medium 800') {
-          data = [size];
+        if (size.label == 'Medium 640') {
+          data.push(size);
         }
+        if (size.label == 'Medium 800') {
+          data.push(size);
+        }
+        console.log(size);
       }
       var sizeEnter = select.selectAll('.size')
           .data(data).enter();
